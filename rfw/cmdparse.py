@@ -97,7 +97,7 @@ def parse_command_path(path):
         else:
             raise PathError(path, 'Too many details for the list command')
 
-    if action == 'whtielist':
+    if action == 'whitelist':
         if len(p) == 1:
             return action, None
         else:
