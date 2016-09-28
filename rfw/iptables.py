@@ -230,7 +230,7 @@ class Iptables:
             raise e
 
     @staticmethod
-     def read_simple_rules(chain=None):
+    def read_simple_rules(chain=None):
         assert chain is None or chain in RULE_CHAINS
         rules = []
         #ipt = Iptables.load()
