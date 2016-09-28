@@ -99,6 +99,10 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
                     list_of_dict = map(iptables.Rule._asdict, rules)                    
                     resp = json.dumps(list_of_dict)
                     return handler.http_resp(200, resp)
+			    elif action == 'whitelist':
+				    resp = rfwconf.whitelist()
+					log.debug('Whitelisted IPs: %s', resp)
+					return handler.http_resp(200, resp)
                 elif rfwconf.is_non_restful():
                     mod = directives.get('modify')
                     if not mod:

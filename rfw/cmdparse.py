@@ -96,6 +96,12 @@ def parse_command_path(path):
                 raise PathError(path, 'Wrong chain name for list command')
         else:
             raise PathError(path, 'Too many details for the list command')
+	
+	if action == 'whtielist':
+	    if len(p) == 1:
+		    return action, None
+		else:
+		    raise PathError(path, 'Too many details for the whitelist command')
         
     raise PathError(path)
 
