@@ -6,3 +6,5 @@ config/temp.conf
 config/deploy/client
 config/deploy/offline
 config/deploy/server_*
+config/rfw.conf
+config/white.list
