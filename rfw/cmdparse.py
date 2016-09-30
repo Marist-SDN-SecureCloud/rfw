@@ -108,8 +108,8 @@ def parse_command_path(path):
 
 # From the path parts tuple build and return Rule for drop/accept/reject type of command
 def build_rule(p):
-    # There must be at least 4 parts like in /drop/input/eth0/1.2.3.4
-    if len(p) < 4:
+    # There must be at least 5 parts like in /drop/input/eth0/tcp/1.2.3.4
+    if len(p) < 5:
         raise ValueError('Not enough details to construct the rule')
     target = p[0].upper()
     if target not in iptables.RULE_TARGETS:
@@ -120,8 +120,10 @@ def build_rule(p):
     iface1 = p[2]
     if len(iface1) > 16:
         raise ValueError('Interface name too long. Max 16 characters')
+    protocol = p[3]
+
     iface1 = convert_iface(iface1)
-    ip1 = iputil.validate_ip(p[3])
+    ip1 = iputil.validate_ip(p[4])
     if not ip1:
         raise ValueError('Incorrect IP address')
 
@@ -130,8 +132,8 @@ def build_rule(p):
     iface2 = None
     ip2 = None
     mask2 = None
-    if len(p) > 4:
-        i = 4
+    if len(p) > 5:
+        i = 5
         # optionally the netmask like: /drop/input/eth0/1.2.3.4/24
         if p[i].isdigit():
             if iputil.validate_mask_limit(p[i]):
@@ -160,9 +162,9 @@ def build_rule(p):
 
 
     if chain in ['INPUT', 'OUTPUT']:
-        if len(p) > 5:
+        if len(p) > 6:
             raise ValueError('Too many details for the {} chain'.format(chain))
-        if len(p) > 4 and not mask1:
+        if len(p) > 5 and not mask1:
             raise ValueError('Incorrect netmask value')
 
     if chain in ['FORWARD']:
@@ -205,7 +207,7 @@ def build_rule(p):
     else:
         assert 'Should not happen'
 
-    return Rule({'target': target, 'chain': chain, 'inp': inp, 'out': out, 'source': source, 'destination': destination})
+    return Rule({'target': target, 'chain': chain, 'inp': inp, 'out': out, 'source': source, 'destination': destination, 'prot': protocol})
 
 
 
