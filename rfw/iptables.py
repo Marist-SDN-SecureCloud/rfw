@@ -233,20 +233,23 @@ class Iptables:
     def read_simple_rules(chain=None):
         assert chain is None or chain in RULE_CHAINS
         rules = []
-        #ipt = Iptables.load()
-        ipt = Iptables.load().rules
+        ipt = Iptables.load()
+        #ipt = Iptables.load().rules
         # rfw originated rules may have only DROP/ACCEPT/REJECT targets and do not specify protocol and do not have extra args like ports
         if chain == 'INPUT' or chain is None:
-            input_rules = [inputs for inputs in ipt if "INPUT" in inputs]
+            #input_rules = [inputs for inputs in ipt if "INPUT" in inputs]
             #input_rules = ipt.find({'target': RULE_TARGETS, 'chain': ['INPUT'], 'destination': ['0.0.0.0/0'], 'out': ['*'], 'prot': ['all'], 'extra': ['']})
+            input_rules = ipt.find2("INPUT")
             rules.extend(input_rules)
         if chain == 'OUTPUT' or chain is None:
-            output_rules = [outputs for outputs in ipt if "OUTPUT" in outputs]
+            #output_rules = [outputs for outputs in ipt if "OUTPUT" in outputs]
             #output_rules = ipt.find({'target': RULE_TARGETS, 'chain': ['OUTPUT'], 'source': ['0.0.0.0/0'], 'inp': ['*'], 'prot': ['all'], 'extra': ['']})
+            output_rules = ipt.find2("OUTPUT")
             rules.extend(output_rules)
         if chain == 'FORWARD' or chain is None:
-            forward_rules = [forwards for forwards in ipt if "FORWARD" in forwards]
+            #forward_rules = [forwards for forwards in ipt if "FORWARD" in forwards]
             #forward_rules = ipt.find({'target': RULE_TARGETS, 'chain': ['FORWARD'], 'prot': ['all'], 'extra': ['']})
+            forward_rules = ipt.find2("FORWARD")
             rules.extend(forward_rules)
         return rules
 
@@ -268,6 +271,20 @@ class Iptables:
                     matched_all = False
                     break
             if matched_all:
+                ret.append(r)
+        return ret
+    
+    # returns current and non-whitelisted rules (includes reject, whereas find() does not)
+    def find2(self, chain):
+        ret = []
+        rules = [r for r in self.rules if chain in r]
+        for r in rules:
+            matched = True
+            extra_val = getattr(r, 'extra')
+            if extra_val in ('tcp dpt:7390', 'tcp spt:7390'):
+                matched = False
+                break
+            if matched:
                 ret.append(r)
         return ret
 
