@@ -73,9 +73,15 @@ class CommonRequestHandler(BaseHTTPRequestHandler):
                      (self.client_address[0],
                       self.log_date_time_string(),
                       format%args))
+    
+    def test(self):
+        print("test")
 
     def http_req_data(self):
-        return self.rfile.read();
+        length = int(self.headers.getheader('content-length'))
+        data = self.rfile.read(length)
+
+        return data
 
     def http_resp(self, code, content):
         content = str(content)

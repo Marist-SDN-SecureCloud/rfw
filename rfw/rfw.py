@@ -153,7 +153,10 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
             self.go(modify, self.path, self.client_address[0], None)
 
         def do_PUT(self):
+            log.debug('Lookng for data...')
+            self.test()
             data = self.http_req_data()
+            log.debug('Data found!')
             self.go('I', self.path, self.client_address[0], data)
     
         def do_DELETE(self):
@@ -181,7 +184,10 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
             process(self, modify, urlpath, data)
 
         def do_PUT(self):
+            log.debug('Lookng for data...')
+            self.test()
             data = self.http_req_data()
+            log.debug('Data found!')
             self.go('I', self.path, self.client_address[0], data)
     
         def do_DELETE(self):
