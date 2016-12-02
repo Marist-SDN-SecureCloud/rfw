@@ -80,7 +80,7 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
             raise Exception(msg)
 
 
-    def process(handler, modify, urlpath):
+    def process(handler, modify, urlpath, data):
         # modify should be 'D' for Delete or 'I' for Insert understood as -D and -I iptables flags
         assert modify in ['D', 'I', 'L']
         log.debug('process {} urlpath: {}'.format(modify, urlpath))
@@ -125,6 +125,11 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
                 log.debug('PUT to Cmd Queue. Tuple: {}'.format(ctup))
                 cmd_queue.put_nowait(ctup)
                 return handler.http_resp(200, ctup)
+            elif modify in ['D', 'I'] and action == 'batch':
+                log.debug('Batch command!')
+                resp = json.dumps(data)
+                return handler.http_resp(200, resp)
+
             else:
                 raise Exception('Unrecognized command.')
         except Exception, e:
@@ -141,20 +146,21 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
         def version_string(self):
             return server_ver
 
-        def go(self, modify, urlpath, remote_addr):
-            process(self, modify, urlpath)
+        def go(self, modify, urlpath, remote_addr, data):
+            process(self, modify, urlpath, data)
 
         def do_modify(self, modify):
-            self.go(modify, self.path, self.client_address[0])
+            self.go(modify, self.path, self.client_address[0], None)
 
         def do_PUT(self):
-            self.go('I', self.path, self.client_address[0])
+            data = self.http_req_data()
+            self.go('I', self.path, self.client_address[0], data)
     
         def do_DELETE(self):
-            self.go('D', self.path, self.client_address[0])
+            self.go('D', self.path, self.client_address[0], None)
     
         def do_GET(self):
-            self.go('L', self.path, self.client_address[0])
+            self.go('L', self.path, self.client_address[0], None)
     
    
 
@@ -166,22 +172,23 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
         def creds_check(self, user, password):
             return user == rfwconf.auth_username() and password == rfwconf.auth_password()
 
-        def go(self, modify, urlpath, remote_addr):
+        def go(self, modify, urlpath, remote_addr, data):
             # authenticate by checking if client IP is in the whitelist - normally reqests from non-whitelisted IPs should be blocked by firewall beforehand
             if not iputil.ip_in_list(remote_addr, rfwconf.whitelist()):
                 log.error('Request from client IP: {} which is not authorized in the whitelist. It should have been blocked by firewall.'.format(remote_addr))
                 return self.http_resp(403, '') # Forbidden 
 
-            process(self, modify, urlpath)
+            process(self, modify, urlpath, data)
 
         def do_PUT(self):
-            self.go('I', self.path, self.client_address[0])
+            data = self.http_req_data()
+            self.go('I', self.path, self.client_address[0], data)
     
         def do_DELETE(self):
-            self.go('D', self.path, self.client_address[0])
+            self.go('D', self.path, self.client_address[0], None)
     
         def do_GET(self):
-            self.go('L', self.path, self.client_address[0])
+            self.go('L', self.path, self.client_address[0], None)
     
    
     return LocalRequestHandler, OutwardRequestHandler

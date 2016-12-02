@@ -84,6 +84,9 @@ def parse_command_path(path):
             return action, build_rule(p)
         except ValueError, e:
             raise PathError(path, e.message)
+
+    if action == 'batch':
+        return action, None
     
     if action == 'list':
         if len(p) == 1:
