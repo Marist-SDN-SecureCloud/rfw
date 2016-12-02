@@ -127,6 +127,10 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
                 return handler.http_resp(200, ctup)
             elif modify in ['D', 'I'] and action == 'batch':
                 log.debug('Batch command!')
+		json_data = json.loads(data)
+                for url in json_data:
+                        path = str(url['path'])
+                	handler.go('I', path, handler.client_address[0], None)
                 resp = json.dumps(data)
                 return handler.http_resp(200, resp)
 
@@ -154,7 +158,6 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
 
         def do_PUT(self):
             log.debug('Lookng for data...')
-            self.test()
             data = self.http_req_data()
             log.debug('Data found!')
             self.go('I', self.path, self.client_address[0], data)
@@ -185,7 +188,6 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
 
         def do_PUT(self):
             log.debug('Lookng for data...')
-            self.test()
             data = self.http_req_data()
             log.debug('Data found!')
             self.go('I', self.path, self.client_address[0], data)
