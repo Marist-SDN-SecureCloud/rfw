@@ -127,9 +127,10 @@ def create_requesthandlers(rfwconf, cmd_queue, expiry_queue):
                 return handler.http_resp(200, ctup)
             elif modify in ['D', 'I'] and action == 'batch':
                 log.debug('Batch command.')
-		        json_data = json.loads(data)
+	        json_data = json.loads(data)
                 for url in json_data:
-                    action, rule, directives = cmdparse.parse_command(url)
+                    path = str(url['path'])
+                    action, rule, directives = cmdparse.parse_command(path)
                     ctup = (modify, rule, directives)
                     log.debug('PUT to Cmd Queue. Tuple: {}'.format(ctup))
                     cmd_queue.put_nowait(ctup)
