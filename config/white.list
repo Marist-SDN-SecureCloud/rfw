@@ -2,5 +2,6 @@
 # You should place here rfw clients IP addresses to prevent them being blocked on iptables. We don't want to accidentaly lock out the legitimate client.
 # It should contain at least one entry
 #TODO allow IP ranges: xxx.xxx.xxx.xxx-yyy.yyy.yyy.yyy
-
-
+127.0.0.1
+10.0.0.0/8
+148.100.0.0/16

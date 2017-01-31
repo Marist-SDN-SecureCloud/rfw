@@ -74,16 +74,17 @@ class CommonRequestHandler(BaseHTTPRequestHandler):
                       self.log_date_time_string(),
                       format%args))
 
-    def http_req_data(self):
-        length = int(self.headers.getheader('content-length'))
-        data = self.rfile.read(length)
-
-        return data
+    def do_OPTIONS(self):
+        self.send_response(200, "OK")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
 
     def http_resp(self, code, content):
         content = str(content)
         self.send_response(code)
         self.send_header("Content-Length", len(content) + 2)
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(content + "\r\n")
         return

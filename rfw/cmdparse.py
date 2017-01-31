@@ -84,9 +84,6 @@ def parse_command_path(path):
             return action, build_rule(p)
         except ValueError, e:
             raise PathError(path, e.message)
-
-    if action == 'batch':
-        return action, None
     
     if action == 'list':
         if len(p) == 1:
@@ -105,7 +102,7 @@ def parse_command_path(path):
             return action, None
         else:
             raise PathError(path, 'Too many details for the whitelist command')
-        
+
     raise PathError(path)
 
 
@@ -171,11 +168,11 @@ def build_rule(p):
             raise ValueError('Incorrect netmask value')
 
     if chain in ['FORWARD']:
-        if len(p) > 8:
+        if len(p) > 9:
             raise ValueError('Too many details for the {} chain'.format(chain))
-        if len(p) > 7 and (not mask1 or not mask2):
+        if len(p) > 8 and (not mask1 or not mask2):
             raise ValueError('Incorrect netmask value')
-        if len(p) > 6 and not mask1 and not mask2:
+        if len(p) > 7 and not mask1 and not mask2:
             raise ValueError('Incorrect netmask value')
 
     if chain == 'INPUT':

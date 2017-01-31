@@ -234,25 +234,20 @@ class Iptables:
         assert chain is None or chain in RULE_CHAINS
         rules = []
         ipt = Iptables.load()
-        #ipt = Iptables.load().rules
         # rfw originated rules may have only DROP/ACCEPT/REJECT targets and do not specify protocol and do not have extra args like ports
         if chain == 'INPUT' or chain is None:
-            #input_rules = [inputs for inputs in ipt if "INPUT" in inputs]
             #input_rules = ipt.find({'target': RULE_TARGETS, 'chain': ['INPUT'], 'destination': ['0.0.0.0/0'], 'out': ['*'], 'prot': ['all'], 'extra': ['']})
             input_rules = ipt.find2("INPUT")
             rules.extend(input_rules)
         if chain == 'OUTPUT' or chain is None:
-            #output_rules = [outputs for outputs in ipt if "OUTPUT" in outputs]
             #output_rules = ipt.find({'target': RULE_TARGETS, 'chain': ['OUTPUT'], 'source': ['0.0.0.0/0'], 'inp': ['*'], 'prot': ['all'], 'extra': ['']})
             output_rules = ipt.find2("OUTPUT")
             rules.extend(output_rules)
         if chain == 'FORWARD' or chain is None:
-            #forward_rules = [forwards for forwards in ipt if "FORWARD" in forwards]
             #forward_rules = ipt.find({'target': RULE_TARGETS, 'chain': ['FORWARD'], 'prot': ['all'], 'extra': ['']})
             forward_rules = ipt.find2("FORWARD")
             rules.extend(forward_rules)
         return rules
-
 
     # find is a non-static method as it should be called after instantiation with Iptables.load()
     def find(self, query):
@@ -273,7 +268,7 @@ class Iptables:
             if matched_all:
                 ret.append(r)
         return ret
-    
+
     # returns current and non-whitelisted rules (includes reject, whereas find() does not)
     def find2(self, chain):
         ret = []
@@ -287,5 +282,3 @@ class Iptables:
             if matched:
                 ret.append(r)
         return ret
-
-
