@@ -341,7 +341,7 @@ def main():
         rfwthreads.ServerRunner(httpd).start()
 
     if rfwconf.is_local_server():
-        server_address = ('10.10.7.84', int(rfwconf.local_server_port()))
+        server_address = ('0.0.0.0', int(rfwconf.local_server_port()))
         httpd = PlainServer(
                     server_address, 
                     LocalHandlerClass)
